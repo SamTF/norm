@@ -1,6 +1,6 @@
 ### IMPORTS        ############################################################
 # My modules
-from thumb_scraper import get_thumb
+import jokes
 # Stdlib
 import json
 from random import randrange
@@ -53,22 +53,23 @@ async def on_ready():
 
 ###### COMMANDS        #######################################################
 ### /jokes
-@bot.hybrid_command(name = 'jokes', description = 'Read a joke for the folks at home')
+@bot.hybrid_command(name = 'joke', description = 'Read a joke for the folks at home')
 @app_commands.guilds(discord.Object(id=349267379991347200))
-async def jokes(ctx):
+async def joke(ctx):
     i = randrange(0, len(JOKES))
     joke = JOKES[i]
 
-    print(f"[NORM.PY] >>> {joke['Joke']}")
+    print(i)
+    print(f"[NORM.PY] >>> {joke}")
 
     # sending joke as an embed
     embed = discord.Embed(
-        title=joke['Episode'],
-        description=joke['Joke'],
+        title=f'{joke.episode} w/ {joke.guest}',
+        description=joke.joke,
         colour=0x2596be
         # url=concert.url,
     )
-    embed.set_thumbnail(url=get_thumb(joke['Guest']))
+    embed.set_thumbnail(url=joke.thumbnail)
     embed.set_image(url=NORM_GIF)
 
     await ctx.send(embed = embed)
@@ -80,6 +81,7 @@ if __name__ == "__main__":
     with open(TOKEN_FILE, 'r') as f:
         token = f.read()
     
-    JOKES = load_jokes()
+    JOKES = jokes.get_jokes()
+    print(f'[NORM.PY] >>> Loaded {len(JOKES)} jokes!')
 
     bot.run(token)
