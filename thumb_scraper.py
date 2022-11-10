@@ -12,6 +12,10 @@ def get_thumb(search: str) -> str:
     soup = BeautifulSoup(source, 'lxml')
 
     results = soup.findAll('img')
-    image_url =results[1].get('src')
+
+    try:
+        image_url = results[1].get('src')
+    except:
+        image_url = 'https://i.imgur.com/fCyBeda.jpg'
 
     return image_url
