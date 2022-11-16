@@ -4,10 +4,13 @@ import jokes
 # Stdlib
 import json
 from random import randrange
+import asyncio
 # Discord
 import discord
 from discord.ext import commands, tasks
 from discord import app_commands
+# FFMPEG
+from discord import FFmpegPCMAudio
 
 
 ###### CONSTANTS        ##########################################################
@@ -73,6 +76,35 @@ async def joke(ctx):
     embed.set_image(url=NORM_GIF)
 
     await ctx.send(embed = embed)
+
+
+### VOICE COMMANDS
+@bot.hybrid_command(name = '911', description = 'For when you need a reminder of that tragedy ;)')
+@app_commands.guilds(discord.Object(id=349267379991347200))
+async def nine_eleven(ctx):
+    print(f"[NORM.PY] >>> {ctx.author} requested a joke")
+
+    # checking if the command author is in a voice channel
+    if not ctx.author.voice:
+        await ctx.send("You have to be in a voice channel to hear the joke. What are you, fucking retarded?", ephemeral = True)
+        return
+    
+    # user feedback
+    await ctx.send("It's time to do jokes! Everyone join the voice chat")
+
+    # connecting to voice channel
+    channel = ctx.author.voice.channel
+    vc = await channel.connect()
+
+    # playing the joke mp3 - and disconnecting from the voice channel after it ends
+    source = FFmpegPCMAudio('audio/911_airlines.mp3')
+    player = vc.play(
+        source,
+        after=lambda _: asyncio.run_coroutine_threadsafe(
+            coro=vc.disconnect(),
+            loop=vc.loop
+        ).result()
+    )
 
 
 ###### RUNNING THE BOT #################################################
